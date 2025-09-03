@@ -77,7 +77,7 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-resource "_instance" "web1" {
+resource "aws_instance" "web1" {
   ami           = var.ami_id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet_1.id
@@ -97,7 +97,7 @@ resource "_instance" "web1" {
               EOF
 }
 
-_instance" "web2" {
+resource "aws_instance" "web2" {
   ami           = var.ami_id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet_2.id
@@ -115,4 +115,3 @@ _instance" "web2" {
               systemctl enable httpd
               echo "Web Server 2" > /var/www/html/index.html
               EOF
-}
