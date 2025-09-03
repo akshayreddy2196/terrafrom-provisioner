@@ -70,16 +70,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_instance" "web1" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
+    instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet_1.id
   security_groups = [aws_security_group.web_sg.name]
 
@@ -88,13 +79,13 @@ resource "aws_instance" "web1" {
   }
 
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "Web Server 1" > /var/www/html/index.html
-              EOF
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    echo "Web Server 1" > /var/www/html/index.html
+  EOF
 }
 
 resource "aws_instance" "web2" {
@@ -108,11 +99,11 @@ resource "aws_instance" "web2" {
   }
 
   user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "Web Server 2" > /var/www/html/index.html
-              EOF
+    #!/bin/bash
+    yum update -y
+    yum install -y httpd
+    systemctl start httpd
+    systemctl enable httpd
+    echo "Web Server 2" > /var/www/html/index.html
+  EOF
 }
