@@ -54,6 +54,7 @@ resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow HTTP and SSH"
   vpc_id      = aws_vpc.custom_vpc.id
+}
 
   ingress {
     from_port   = 22
