@@ -10,18 +10,20 @@ resource "aws_vpc" "custom_vpc" {
 }
 
 resource "aws_subnet" "subnet_1" {
-  vpc_id            = aws_vpc.custom_vpc.id
-  cidr_block        = var.subnet_1_cidr
-  availability_zone = var.availability_zone_1
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = var.subnet_1_cidr
+  availability_zone       = var.availability_zone_1
+  map_public_ip_on_launch = true # Required for public instances
   tags = {
     Name = "subnet-1"
   }
 }
 
 resource "aws_subnet" "subnet_2" {
-  vpc_id            = aws_vpc.custom_vpc.id
-  cidr_block        = var.subnet_2_cidr
-  availability_zone = var.availability_zone_2
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = var.subnet_2_cidr
+  availability_zone       = var.availability_zone_2
+  map_public_ip_on_launch = true # Required for public instances
   tags = {
     Name = "subnet-2"
   }
@@ -54,7 +56,6 @@ resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow HTTP and SSH"
   vpc_id      = aws_vpc.custom_vpc.id
-}
 
   ingress {
     from_port   = 22
@@ -71,9 +72,18 @@ resource "aws_security_group" "web_sg" {
   }
 
   egress {
-    instance_type = var.instance_type
-  subnet_id     = aws_subnet.subnet_1.id
-  security_groups = [aws_security_group.web_sg.name]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # Allow all outbound traffic
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "web1" {
+  ami             = var.ami_id
+  instance_type   = var.instance_type
+  subnet_id       = aws_subnet.subnet_1.id
+  security_groups = [aws_security_group.web_sg.id] # Reference the security group ID
 
   tags = {
     Name = "WebServer1"
@@ -90,10 +100,10 @@ resource "aws_security_group" "web_sg" {
 }
 
 resource "aws_instance" "web2" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  subnet_id     = aws_subnet.subnet_2.id
-  security_groups = [aws_security_group.web_sg.name]
+  ami             = var.ami_id
+  instance_type   = var.instance_type
+  subnet_id       = aws_subnet.subnet_2.id
+  security_groups = [aws_security_group.web_sg.id] # Reference the security group ID
 
   tags = {
     Name = "WebServer2"
