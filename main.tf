@@ -27,9 +27,57 @@ resource "aws_subnet" "subnet_2" {
   }
 }
 
-# ... rest of the resources remain the same, just update instance_type and ami_id
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.custom_vpc.id
+}
 
-resource "aws_instance" "web1" {
+resource "aws_route_table" "rt" {
+  vpc_id = aws_vpc.custom_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+}
+
+resource "aws_route_table_association" "rta1" {
+  subnet_id      = aws_subnet.subnet_1.id
+  route_table_id = aws_route_table.rt.id
+}
+
+resource "aws_route_table_association" "rta2" {
+  subnet_id      = aws_subnet.subnet_2.id
+  route_table_id = aws_route_table.rt.id
+}
+
+resource "aws_security_group" "web_sg" {
+  name        = "web-sg"
+  description = "Allow HTTP and SSH"
+  vpc_id      = aws_vpc.custom_vpc.id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "_instance" "web1" {
   ami           = var.ami_id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet_1.id
@@ -49,7 +97,7 @@ resource "aws_instance" "web1" {
               EOF
 }
 
-resource "aws_instance" "web2" {
+_instance" "web2" {
   ami           = var.ami_id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet_2.id
