@@ -115,3 +115,4 @@ resource "aws_instance" "web2" {
               systemctl enable httpd
               echo "Web Server 2" > /var/www/html/index.html
               EOF
+}
